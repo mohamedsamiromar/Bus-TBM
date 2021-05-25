@@ -1,36 +1,34 @@
 from _ast import Is
 from datetime import datetime
 
-from rest_framework import status
+import mixins as mixins
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Trip, Booking
-from .serializer import TripReservation, AssignTrip
-from .permission import IsCaptin, IsPassenger, IsAdmin
+from .models import Trip, Booking, Captin, Passenger
+from .serializer import TripReservation, CaptinSerializer, PassengerSerializer
+from .permission import PassengerPermission
+
+from rest_framework import mixins, permissions
+from rest_framework.viewsets import GenericViewSet
 
 
 class WhereFrom(APIView):
-    # permission_classes = [IsPassenger, ]
+    permission_classes = [PassengerPermission]
 
     def post(self, request):
         serializer = TripReservation(data=request.data)
         if serializer.is_valid():
             from_address = serializer.validated_data['from_address']
             to_address = serializer.validated_data['to_address']
-            reserved_seats = serializer.validated_data['reserved_seats']
-            data = serializer.validated_data['data']
-            if data is None or from_address is None or to_address is None or reserved_seats is None:
+            date = serializer.validated_data['date']
+            if date is None or from_address is None or to_address is None:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            trip = Trip.objects.filter(from_date__lts=data, to_date__gte=data, from_address=from_address,
+            trip = Trip.objects.filter(from_date__lts=date, to_date__gte=date, from_address=from_address,
                                        to_address=to_address)
             return Response(serializer, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, pk=None):
-        trip = Trip.objects.get(pk=pk)
-        trip.delete()
-        return Response(status=status.HTTP_201_CREATED)
 
 
 class CreateTrip(APIView):
@@ -87,15 +85,15 @@ class CreateTrip(APIView):
 
 
 class Reserved(APIView):
-    # permission_classes = [IsPassenger]
+    permission_classes = [PassengerPermission]
 
     def post(self, request, pk=None):
         trip = Trip.objects.get(pk=pk)
         reserved_seats = request.data.get('reserved_seats')
         if trip.reserved + reserved_seats >= trip.bus.number_seat:
-            return {"Massage": "Bus Is Full"}
+            return Response({"Massage": "Bus Is Full"})
         else:
-            reserved_seats -= trip.reserved
+            reserved_seats += trip.reserved
             booking = Booking()
             booking.from_address = trip.from_address
             booking.to_address = trip.to_address
@@ -106,7 +104,7 @@ class Reserved(APIView):
             booking.total_price = price * reserved_seats
             booking.reserved_seats = reserved_seats
             booking.save()
-        return Response(status=status.HTTP_201_CREATED)
+        return Response({'message': 'Your trip reserved successfully'}, status=status.HTTP_201_CREATED)
 
     def delete(self, pk=None):
         booking = Booking.objects.get(pk=pk)
@@ -119,7 +117,7 @@ class Reserved(APIView):
         if trip.reserved + reserved >= trip.bus.number_seat:
             return {"Massage": "Bus Is Full"}
         else:
-            reserved -= trip.reserved_seats
+            reserved += trip.reserved_seats
             booking = Booking()
             booking.trip = trip
             booking.reserved_seats = reserved
@@ -139,3 +137,28 @@ class TakeTrip(APIView):
         captin = request.data.get('captin')
         trip = Trip.objects.filter(captin=captin)
         return Response(trip, status=status.HTTP_201_CREATED)
+
+
+class CreateCaptin(APIView):
+    def post(self, request):
+        captin_form = CaptinSerializer(data=request.data)
+        if captin_form.is_valid():
+            phone_number = captin_form.validated_data['phone_number']
+            email = captin_form.validated_data['email']
+            captin = Captin()
+            captin.phone_number = phone_number
+            captin.email = email
+            captin.save()
+            return Response(CaptinSerializer(captin).data, status=status.HTTP_201_CREATED)
+        return Response(captin_form.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# create captin with a best practice
+class CaptinListApi(generics.ListCreateAPIView):
+    serializer_class = CaptinSerializer
+    queryset = Captin.objects.all()
+
+
+class PassengerView(generics.ListCreateAPIView):
+    serializer_class = PassengerSerializer
+    queryset = Passenger.objects.all()

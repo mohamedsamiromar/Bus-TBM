@@ -16,8 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken import views
-
-from swvl.views import WhereFrom, CreateTrip, Reserved, TakeTrip
+from swvl.views import CaptinListApi, PassengerView
+from swvl.views import WhereFrom, CreateTrip, Reserved, TakeTrip, CreateCaptin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +26,11 @@ urlpatterns = [
     path('reserved_view/<int:pk>', Reserved.as_view()),
     path('api-auth/', include('rest_framework.urls')),
     path('take_trip', TakeTrip.as_view()),
-    path('token-auth', views.obtain_auth_token, name='api_token_auth')
+    # token_url
+    path('token-auth', views.obtain_auth_token, name='api_token_auth'),
+    path('captin', CreateCaptin.as_view(), name="create_captin"),
+    # generic
+    path('captin_', CaptinListApi.as_view(), name="create_captin"),
+    path('passeger', PassengerView.as_view(), name="Create_passenger")
 
 ]

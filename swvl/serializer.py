@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from swvl.models import Captin, Passenger
+
 
 class CreateTrip(serializers.Serializer):
     bus = serializers.CharField()
@@ -18,3 +20,14 @@ class TripReservation(serializers.Serializer):
     reserved_seats = serializers.IntegerField()
     data = serializers.DateTimeField()
 
+
+class CaptinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Captin
+        fields = ['id', 'phone_number', 'email']
+
+
+class PassengerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Passenger
+        fields = ["id", "phone_number", "email"]
