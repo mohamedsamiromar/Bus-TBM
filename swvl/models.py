@@ -12,13 +12,13 @@ class Bus(models.Model):
 
 
 class Captin(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='captin')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='captin')
     phone_number = models.IntegerField()
     email = models.EmailField(blank=True, null=True, max_length=254)
 
 
 class Passenger(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='passenger')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='passenger')
     phone_number = models.IntegerField(null=True)
     email = models.EmailField(blank=True, null=True, max_length=254)
 
@@ -51,7 +51,8 @@ class Booking(models.Model):
     total_price = models.IntegerField(null=True)
     date = models.DateTimeField(default=datetime.now())
 
+
 class Admin(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    namw = models.CharField(max_length=150, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin')
+    name = models.CharField(max_length=150, null=True)
     email = models.EmailField()

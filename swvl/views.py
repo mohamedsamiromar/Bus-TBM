@@ -5,23 +5,22 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Trip, Booking
-from .serializer import TripReservation, AssignTrip
-from .permission import IsCaptin, IsPassenger, IsAdmin
+from .serializer import TripReservation
+from .permission import IsPassenger
 
 
 class WhereFrom(APIView):
-    # permission_classes = [IsPassenger, ]
+    permission_classes = [IsPassenger]
 
     def post(self, request):
         serializer = TripReservation(data=request.data)
         if serializer.is_valid():
             from_address = serializer.validated_data['from_address']
             to_address = serializer.validated_data['to_address']
-            reserved_seats = serializer.validated_data['reserved_seats']
-            data = serializer.validated_data['data']
-            if data is None or from_address is None or to_address is None or reserved_seats is None:
+            date = serializer.validated_data['date']
+            if date is None or from_address is None or to_address is None :
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            trip = Trip.objects.filter(from_date__lts=data, to_date__gte=data, from_address=from_address,
+            trip = Trip.objects.filter(from_date__lts=date, to_date__gte=date, from_address=from_address,
                                        to_address=to_address)
             return Response(serializer, status=status.HTTP_201_CREATED)
         else:
@@ -87,7 +86,7 @@ class CreateTrip(APIView):
 
 
 class Reserved(APIView):
-    # permission_classes = [IsPassenger]
+    permission_classes = [IsPassenger]
 
     def post(self, request, pk=None):
         trip = Trip.objects.get(pk=pk)
@@ -95,7 +94,7 @@ class Reserved(APIView):
         if trip.reserved + reserved_seats >= trip.bus.number_seat:
             return {"Massage": "Bus Is Full"}
         else:
-            reserved_seats -= trip.reserved
+            reserved_seats += trip.reserved
             booking = Booking()
             booking.from_address = trip.from_address
             booking.to_address = trip.to_address
@@ -119,7 +118,7 @@ class Reserved(APIView):
         if trip.reserved + reserved >= trip.bus.number_seat:
             return {"Massage": "Bus Is Full"}
         else:
-            reserved -= trip.reserved_seats
+            reserved += trip.reserved_seats
             booking = Booking()
             booking.trip = trip
             booking.reserved_seats = reserved
