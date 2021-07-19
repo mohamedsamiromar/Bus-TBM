@@ -56,3 +56,4 @@ class Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin')
     name = models.CharField(max_length=150, null=True)
     email = models.EmailField()
+
