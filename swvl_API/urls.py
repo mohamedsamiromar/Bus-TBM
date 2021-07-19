@@ -15,22 +15,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+from rest_framework_simplejwt import views as jwt_views
+
 from rest_framework.authtoken import views
-from swvl.views import CaptinListApi, PassengerView
-from swvl.views import WhereFrom, CreateTrip, Reserved, TakeTrip, CreateCaptin
+from swvl.views import CaptinListApi, PassengerView, RegisterView, LoginAPI
+from swvl.views import WhereFrom, CreateTrip, Reserved, TakeTrip, BusView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('where_from', WhereFrom.as_view()),
-    path('create_trip', CreateTrip.as_view()),
+    path('create_trip', CreateTrip.as_view(), name='trip'),
     path('reserved_view/<int:pk>', Reserved.as_view()),
     path('api-auth/', include('rest_framework.urls')),
     path('take_trip', TakeTrip.as_view()),
     # token_url
     path('token-auth', views.obtain_auth_token, name='api_token_auth'),
-    path('captin', CreateCaptin.as_view(), name="create_captin"),
     # generic
-    path('captin_', CaptinListApi.as_view(), name="create_captin"),
-    path('passeger', PassengerView.as_view(), name="Create_passenger")
-
+    path('captin', CaptinListApi.as_view(), name="create_captin"),
+    path('passeger', PassengerView.as_view(), name="Create_passenger"),
+    path('bus', BusView.as_view(), name="bus"),
+    # Register
+    path('register', RegisterView.as_view(), name='register'),
+    # Login
+    path('login', LoginAPI.as_view(), name='login')
 ]

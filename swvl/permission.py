@@ -1,6 +1,6 @@
 from rest_framework import permissions, status
 from django.contrib.auth.models import User
-from swvl.models import Passenger
+from swvl.models import Passenger, Captin, Admin
 from rest_framework.response import Response
 
 
@@ -21,11 +21,25 @@ class IsPassenger(permissions.IsAuthenticated):
 #     def has_permission(self, request, view):
 #         return request.user.admin and request.user.is_authenticated()
 
-#
-# class PassengerPermission(permissions.IsAuthenticated):
-#     def has_permission(self, request, view):
-#         passenger = Passenger.objects.filter(user_id=request.user.passenger).filter()
-#         if passenger:
-#             return Response(status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)
+class PassengerPermission(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        passenger = Passenger.objects.filter(user=request.user).first()
+        if passenger:
+            return True
+        return False
+
+
+class CaptinPermission(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        passenger = Captin.objects.filter(user=request.user).first()
+        if passenger:
+            return True
+        return False
+
+
+class AdminPermission(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        passenger = Admin.objects.filter(user=request.user).first()
+        if passenger:
+            return True
+        return False

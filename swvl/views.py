@@ -2,12 +2,16 @@ from _ast import Is
 from datetime import datetime
 
 import mixins as mixins
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 from rest_framework import status, generics
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Trip, Booking, Captin, Passenger
-from .serializer import TripReservation, CaptinSerializer, PassengerSerializer
-from .permission import PassengerPermission
+from .models import Trip, Booking, Captin, Passenger, Bus
+from .serializer import TripReservation, CaptinSerializer, PassengerSerializer, RegisterSerializer, \
+    LoginSerializer, BusSerializer
+from .permission import PassengerPermission, CaptinPermission, AdminPermission
 
 from rest_framework import mixins, permissions
 from rest_framework.viewsets import GenericViewSet
@@ -32,7 +36,7 @@ class WhereFrom(APIView):
 
 
 class CreateTrip(APIView):
-    # permission_classes = [IsAdmin]
+    permission_classes = [AdminPermission]
 
     def post(self, request):
         from_address = request.data.get('from_address')
@@ -84,6 +88,12 @@ class CreateTrip(APIView):
         return trip_id
 
 
+class BusView(generics.ListCreateAPIView):
+    serializer_class = BusSerializer
+    queryset = Bus.objects.all()
+    permission_classes = [AdminPermission]
+
+
 class Reserved(APIView):
     permission_classes = [PassengerPermission]
 
@@ -132,6 +142,7 @@ class Reserved(APIView):
 
 
 class TakeTrip(APIView):
+    permission_classes = [CaptinPermission]
 
     def get(self, request):
         captin = request.data.get('captin')
@@ -140,6 +151,7 @@ class TakeTrip(APIView):
 
 
 class CreateCaptin(APIView):
+    permission_classes = [AdminPermission]
     def post(self, request):
         captin_form = CaptinSerializer(data=request.data)
         if captin_form.is_valid():
@@ -157,8 +169,44 @@ class CreateCaptin(APIView):
 class CaptinListApi(generics.ListCreateAPIView):
     serializer_class = CaptinSerializer
     queryset = Captin.objects.all()
+    permission_classes = [CaptinPermission]
 
 
 class PassengerView(generics.ListCreateAPIView):
     serializer_class = PassengerSerializer
     queryset = Passenger.objects.all()
+    permission_classes = [PassengerPermission]
+
+
+class LoginAPI(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return super(LoginAPI, self)
+
+
+# Register API
+class RegisterView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            frist_name = serializer.validated_data['first_name']
+            last_name = serializer.validated_data['last_name']
+            email = serializer.validated_data['email']
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+
+            user = User()
+            user.first_name = frist_name
+            user.last_name = last_name
+            user.email = email
+            user.username = username
+            user.set_password(password)
+            user.save()
+            return Response(RegisterSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(RegisterSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
