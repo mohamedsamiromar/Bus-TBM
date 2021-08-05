@@ -93,20 +93,12 @@ WSGI_APPLICATION = 'swvl_API.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'swvl',
-        'USER': 'root',
+        'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    },
-    'test': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'swvl_test',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 

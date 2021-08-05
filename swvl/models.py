@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.template.backends import django
 
 
 class Bus(models.Model):
@@ -49,7 +50,6 @@ class Booking(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, null=True)
     price = models.IntegerField(null=True)
     total_price = models.IntegerField(null=True)
-    date = models.DateTimeField(default=datetime.now())
 
 
 class Admin(models.Model):
