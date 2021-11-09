@@ -2,15 +2,15 @@
 
 A demo application for a bus trip implemented using Python, Django Rest framework, Json Web Token, Rest Full.
 
-##Abstract
+## Abstract
 It allows the manager to manage the station from bus trips, assign captains and buses, and make various trips in lines, different regions and different times, and also works in assigning trips to the captain.
 
 
-##Features
+## Features
 Secured, Authorized and Paginated endpoints.
 
 
-##Register
+## Register
 To register side
 
 Method	| Path	| Description	| User authenticated
@@ -20,7 +20,7 @@ POST	| /register| sign up to side         |  AllowAny
 
 
 
-##Captin 
+## Captin 
 Create captin
 
 Method	| Path	| Description	| User authenticated	
@@ -42,7 +42,7 @@ PUT		| /captin/id	|  Update passeger By Id | passeger
 Delete	| /captin/id	|  Delete passeger By Id | passeger
 
 
-##Trip 
+## Trip 
 create trip by admin endpoint
 
 Method	| Path	| Description	| User authenticated	
@@ -54,7 +54,7 @@ Delete	| /create_trip/id	|  Delete Trip By Id | Admin
 
 
 
-##Bus
+## Bus
 Create Bus by Admin 
 
 Method	| Path	| Description	| User authenticated	
@@ -66,7 +66,7 @@ Delete	| /bus/id	|  Delete bus By Id | Admin
 
 
 
-##Where From 
+## Where From 
 In the feature it is allow for passenger to searching about for your trip endpoint
 
 Method	| Path	| Description	| User authenticated	
@@ -75,7 +75,7 @@ POST	| /where_from	| Search about your trip|  passenger
 
 
 
-##Reserved
+## Reserved
 Reserved trip by passenger endpoint 
 
 Method	| Path	| Description	| User authenticated	
