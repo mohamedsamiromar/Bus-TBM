@@ -1,4 +1,4 @@
-# Bus trip Managemet 
+#  Trip Bus  Managemet 
 
 A demo application for a bus trip implemented using Python, Django Rest framework, Json Web Token, Rest Full.
 
