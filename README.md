@@ -3,7 +3,7 @@
 A demo application for a bus trip implemented using Python, Django Rest framework, Json Web Token, Rest Full.
 
 ## Abstract
-It allows the manager to manage the station from bus trips, assign captains and buses, and make various trips in lines, different regions and different times, and also works in assigning trips to the captain.
+It allows the manager to manage the station from bus trips, assign captains and buses, and make various trips in lines, different regions and different times, and also works in assigning trips to the captain,and he also manage the reservation process
 
 ## Features
 Secured, Authorized and Paginated endpoints.
